@@ -104,6 +104,40 @@ goods: {
  }
 }
 ```
+### 联动校验
+以某个页面test.vue为例，校验关联供应商中  ‘每个业务城市必须要有一个主供应商’
+
+test.vue：
+1.只需要在table表格里加上
+```
+v-td-validate="{trigger: 'blur',ruleType: 'goods.purchasePrice', isGroup: true, global: 'supplierList', ns: 'purchasePrice', change: supplierLengthChange}"
+```
+其中ruleType指向的是你的校验规则
+其中global指向的是你需要校验的值（对象或数组）对应的键
+其中change指向的是某个在你的表格变化时同时改变的值，用于触发输出重新绑定
+```
+<el-table :data="supplierList"
+    v-td-validate="{trigger: 'blur',ruleType: 'goods.purchasePrice', isGroup: true, global: 'supplierList', ns: 'purchasePrice', change: supplierLengthChange}">
+</el-table>
+```
+2.在rule.js中写联动校验的匹配规则
+联动校验的规则写在UNION中validate: (val, global) 中 global获取的是页面中绑定的值（对象或数组）
+```
+purchasePrice: {
+    UNION: [{
+        errorMsg: '每个业务城市必须要有一个主供应商',
+        trigger: 'change',
+        validate: (val, global) => {
+                let distorctCity = {}
+                global.forEach((item) => {
+                        if (!distorctCity[item.distorctCity]) {
+                                distorctCity[item.distorctCity] = item.isPrimarySupplier
+                        }
+                })
+                return !Object.values(distorctCity).some(val => !val)
+        }
+}]
+```
 ## Project setup
 ```
 npm install
