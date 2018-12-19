@@ -1,4 +1,5 @@
-# hello-world
+# 项目基于vue-cli 3.0生成的hello world模板修改而来.......
+## 主要内容：v-td-validate指令的实现
 
 ## Project setup
 ```
