@@ -10,6 +10,13 @@
    2. 以alert的方式弹出提示语，直接显示一个弹出框（模态框）的方式，比如element-ui中的message,messageBox就是这类的方式
 这两类均有其适用场合：对于tip方式，常规的格式校验，比较适用于这类场合；对于alert适用于提交页面时，最后的校验提示这类场合；
 对比两者可以发现：以tip的方式呈现校验信息是比较合理，且交互感更清晰，更舒适的方式；alert方式会给人一种程序出现错误或异常的错觉，感观不佳；
+二.实现思路：
+  1. 校验的基本要素： rule规则、validate校验器、validator校验器对象； 三者关系为：n:1  n:1;即1个校验器可以有多条rules，一个校验器对象可以有多个validate
+      rule: {regExp: RegExp, errorMsg: String, validate: Function}
+      validate: Validate: {rules: [rule,......], validValue: 'value' , valid: Function }
+      validator: {el,vm,modifiers,bindInstance,bindingValue,validResult,validMsg,trigger, check, getRulesConfig}
+  2. 初始化工作：解析bind,获取绑定值(bind.value)--→ 创建校验器对象(createValidator)---→ 绑定事件(initEvents)
+  3. 校验工作有校验器valiate完成，校验的优先级为：rule中的validator > 内联规则 > 自定义的规则 > 默认规则
 ## Project setup
 ```
 npm install
