@@ -1,5 +1,28 @@
 # 项目基于vue-cli 3.0生成的hello world模板修改而来.......
-## 主要内容：v-td-validate指令的实现
+## 项目启动
+## Project setup
+```
+npm install
+```
+### Compiles and hot-reloads for development
+```
+npm run serve
+```
+### Compiles and minifies for production
+```
+npm run build
+```
+### Run your tests
+```
+npm run test
+```
+### Lints and fixes files
+```
+npm run lint
+```
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).
+# 主要内容：v-td-validate指令的实现
 ## 项目说明
 ### 背景
   在eywa的前端项目中存在诸多的输入格式校验的需求，常见的校验大致分为两类：
@@ -138,30 +161,21 @@ purchasePrice: {
         }
 }]
 ```
-## Project setup
+### 更新日志
 ```
-npm install
-```
-
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+/**
+ * version 0.0.1： 只支持单个输入的校验，支持修饰符的使用
+ * 后续版本： 支持表单组的校验
+ * 后续版本： 支持校验后，回调处理；支持逻辑相关的校验，支持联动校验（在对象组中的校验）
+ * version: 0.0.2：支持对象组的校验；
+ * 思路： 对象组传使用bing.value.isGroup来标识是对象组校验；
+ * 此时： 规则n : 校验器函数1; 校验器函数n: 校验器1： 校验器1： 1校验器对象
+ * rules: validate validate: validateFunc validateFunc: validator
+ * rule: [regExp, errorMsg, validator, trigger]
+ * ruleType: ruleConfig: {property1: rules, property2: rules} 做加工生成 [....new Validate(rules, value)], 再去validateFunc中做匹配逻辑
+ * version: 0.0.3 : 支持联动逻辑
+ * 思路：1. 对象组传递的bind.value中传递一个当前对象组对象过来，存放在 bind.value.global
+ * 2. 规则的validate校验中增加global,允许联动global中的其他字段来做校验；
+ * 3. 实现原理：通过在各个子元素校验时，发送一个union的事件，而父元素监听一个union事件来响应；本质是将联动的规则放入了父元素中去响应。要求配置的rules中存放一个UNION的规则对象
+ */
+ ```
