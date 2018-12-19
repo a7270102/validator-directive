@@ -47,6 +47,59 @@
     'notEmpty': true, // v-td-validate.notEmpty="{}"
  }
 ```
+### 应用规范
+1. 单个使用
+```
+<el-input class="ey-input-small" placeholder="如:100" v-model.number.trim="skuSize.length" :validValue="skuSize.length" type="number" v-td-validate="{trigger: 'blur', ns: 'skuSizelength', ruleType: 'PositiveFloat'}"></el-input>
+<el-input class="ey-input-small" placeholder="如:100" v-model.number.trim="skuSize.length" :validValue="skuSize.length" type="number" v-td-validate.positive="{trigger: 'blur', ns: 'skuSizelength'}"></el-input>
+<el-input class="ey-input-small" placeholder="如:100" v-model.number.trim="skuSize.length" :validValue="skuSize.length" type="number" v-td-validate.positive="{ns: 'skuSizelength'}"></el-input>
+```
+注意： 1. validValue:  用存放需要校验的值， 这里直接使用的自定义的属性做的绑定，标准的做法是使用HTML规范： dateset，即自定义属性data-*的方式；考虑是应用在vue组件中，:attribute=“” 提供了动态变化的能力，暂时这样使用
+      2. 使用ruleType可以直接应用在validate.js或是rule.js中预定义好的规则，rule.js支持手动添加，且支持嵌套路径，如a.b.c这样的字符串
+2. 对象应用：将多个校验纳入一个对象组中，这里指令绑定在多个校验的共同父组件上。以可增删动态变化的数组对象为例：
+```
+<el-table :data="boxBarcode" v-td-validate="{ruleType: 'goods.boxBarCode', isGroup: true, ns: 'boxBarcode', change: boxBarcode.length}">
+ <el-table-column prop="property" label="条码属性" width="120">
+ <template slot-scope="scope">
+ <span>国际条码</span>
+ </template>
+ </el-table-column>
+ <el-table-column prop="barcode" label="条码" width="200">
+ <template slot-scope="scope">
+ <!--<el-input placeholder="请输入8或13位条码" v-model.trim="scope.row.barcode" @change="inputSkuBarcode(scope.row,scope.$index,'box')" @blur="valiNum"></el-input>-->
+ <el-input placeholder="请输入8或13位条码" v-model.trim="scope.row.barcode" class="valid-field-barcode" :validValue="scope.row.barcode"></el-input>
+ </template>
+ </el-table-column>
+ <el-table-column prop="packingSize" label="装箱数量" width="110" >
+ <template slot-scope="scope">
+ <!--<el-input placeholder="如:4" class="ey-input-small" v-model.number.trim="scope.row.packingSize" type="number" @change="inputPackingSize" @focus="focusBoxBarcode(scope.$index)" @blur="valiNum"></el-input>-->
+ <el-input placeholder="如:4" class="ey-input-small valid-field-packingSize" v-model.number.trim="scope.row.packingSize" type="number" :validValue="scope.row.packingSize"></el-input>
+ </template>
+ </el-table-column>
+</el-table>
+```
+注意： 1. 对象应用时，v-td-validate绑定在其共同的父元素上，如scope.row.barcode 和 scope.row.packingSize对应的input；
+      2. 当前对象是一个数组，具有新增，删除记录的操作，指令在初始时，只能执行一次，因此需要有一个对操作敏感的绑定值来触发重新绑定的动作：在指令的声明周期中，update钩子中，存在了value和oldValue，可以用来对比，发现变化，从而做绑定逻辑，因此需要一个敏感的绑定参数，这里选择了数组对boxBarcode.lengt做为change的值；
+      3. 对象绑定，需要有设置isGroup标识，同时在需要校验的子元素上需要添加对应的class类，用于定位校验元素，class规则为：valid-field-xxx,  xxx为与规则对应的属性，如：valid-field-barcode 即将应用 'goods.boxBarCode'命名下的barcode规则：
+```
+goods: {
+ boxBarCode: {
+   barcode: [{
+     regExp: /\d{8}|\d{13}$/,
+     errorMsg: '国际条码长度是18位或者13位',
+     trigger: 'blur'
+   }],
+   packingSize: [{
+     errorMsg: '必须为正数',
+     trigger: 'blur',
+     validate: (val) => {
+        val = Number(val)
+        return val > 0
+     }
+   }]
+ }
+}
+```
 ## Project setup
 ```
 npm install
